@@ -30,12 +30,9 @@ app.add_middleware(
 )
 
 # Load model and vectorizer
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PARENT_DIR = os.path.dirname(BASE_DIR)
-
-model_path = os.path.join(PARENT_DIR, "sentiment_model.pkl")
-vectorizer_path = os.path.join(PARENT_DIR, "vectorizer.pkl")
-datasets_path = os.path.join(PARENT_DIR, "datasets")
+model_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "sentiment_model.pkl")
+vectorizer_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "vectorizer.pkl")
+datasets_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "datasets")
 
 model = pickle.load(open(model_path, "rb"))
 vectorizer = pickle.load(open(vectorizer_path, "rb"))
