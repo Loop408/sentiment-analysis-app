@@ -1,0 +1,12 @@
+{
+  "name": "sentiment-analysis-backend",
+  "version": "1.0.0",
+  "description": "Backend API for sentiment analysis",
+  "main": "main.py",
+  "scripts": {
+    "start": "python main.py"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}
