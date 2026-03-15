@@ -40,6 +40,3 @@ yarn-error.log*
 # Model files (optional - remove if you want to include in repo)
 *.pkl
 *.joblib
-
-# Datasets (optional - remove if you want to include in repo)
-datasets/
