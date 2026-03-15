@@ -23,7 +23,7 @@ app = FastAPI(title="Twitter Sentiment Analysis API", version="1.0.0")
 # Enable CORS for React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "https://loop408.github.io", "https://loop408.github.io/sentiment-analysis-app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,7 +32,7 @@ app.add_middleware(
 # Load model and vectorizer
 model_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "sentiment_model.pkl")
 vectorizer_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "vectorizer.pkl")
-datasets_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "datasets")
+datasets_path = os.path.join(os.path.dirname(__file__), "datasets")
 
 model = pickle.load(open(model_path, "rb"))
 vectorizer = pickle.load(open(vectorizer_path, "rb"))
