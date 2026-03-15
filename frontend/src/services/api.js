@@ -1,7 +1,7 @@
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://sentiment-analysis-app-1nfu.onrender.com';
 
 export const predictSentiment = async (tweet) => {
-  const response = await fetch(`${API_BASE_URL}/predict`, {
+  const response = await fetch(${API_BASE_URL}/predict, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ export const predictSentiment = async (tweet) => {
 };
 
 export const analyzeHashtag = async (hashtag) => {
-  const response = await fetch(`${API_BASE_URL}/analyze-hashtag`, {
+  const response = await fetch(${API_BASE_URL}/analyze-hashtag, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
