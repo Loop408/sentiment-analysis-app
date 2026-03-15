@@ -238,3 +238,5 @@ def health_check():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+#   F o r c e   r e b u i l d   0 3 / 1 5 / 2 0 2 6   1 6 : 4 0 : 5 4  
+ 
