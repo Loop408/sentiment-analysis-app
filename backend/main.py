@@ -23,7 +23,7 @@ app = FastAPI(title="Twitter Sentiment Analysis API", version="1.0.0")
 # Enable CORS for React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://loop408.github.io", "https://loop408.github.io/sentiment-analysis-app"],
+    allow_origins=["http://localhost:3000", "https://loop408.github.io", "https://loop408.github.io/sentiment-analysis-app", "*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -238,5 +238,3 @@ def health_check():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-#   F o r c e   r e b u i l d   0 3 / 1 5 / 2 0 2 6   1 6 : 4 0 : 5 4  
- 
