@@ -32,7 +32,7 @@ app.add_middleware(
 # Load model and vectorizer
 model_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "sentiment_model.pkl")
 vectorizer_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "vectorizer.pkl")
-datasets_path = os.path.join(os.path.dirname(__file__), "datasets")
+datasets_path = os.path.dirname(__file__)
 
 model = pickle.load(open(model_path, "rb"))
 vectorizer = pickle.load(open(vectorizer_path, "rb"))
