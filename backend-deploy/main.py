@@ -6,9 +6,11 @@ import pickle
 import re
 import os
 
+# SIMPLE STOPWORDS - no NLTK dependency
+STOP_WORDS = {'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'through', 'during', 'before', 'after', 'above', 'below', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 'can', 'will', 'just', 'should', 'now'}
+
 app = FastAPI(title="Twitter Sentiment Analysis API", version="1.0.0")
 
-# Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,24 +19,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# LAZY LOADING - only load when needed
+# LAZY LOADING with error handling
 _model = None
 _vectorizer = None
 
 def get_model():
     global _model
     if _model is None:
-        current_dir = os.path.dirname(__file__)
-        model_path = os.path.join(current_dir, "sentiment_model.pkl")
-        _model = pickle.load(open(model_path, "rb"))
+        try:
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            model_path = os.path.join(current_dir, "sentiment_model.pkl")
+            with open(model_path, "rb") as f:
+                _model = pickle.load(f)
+        except Exception as e:
+            print(f"Model load error: {e}")
+            raise
     return _model
 
 def get_vectorizer():
     global _vectorizer
     if _vectorizer is None:
-        current_dir = os.path.dirname(__file__)
-        vectorizer_path = os.path.join(current_dir, "vectorizer.pkl")
-        _vectorizer = pickle.load(open(vectorizer_path, "rb"))
+        try:
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            vectorizer_path = os.path.join(current_dir, "vectorizer.pkl")
+            with open(vectorizer_path, "rb") as f:
+                _vectorizer = pickle.load(f)
+        except Exception as e:
+            print(f"Vectorizer load error: {e}")
+            raise
     return _vectorizer
 
 def clean_text(text):
@@ -44,6 +56,7 @@ def clean_text(text):
     text = re.sub(r"#\w+", "", text)
     text = re.sub(r"[^a-zA-Z]", " ", text)
     words = text.split()
+    words = [w for w in words if w not in STOP_WORDS and len(w) > 2]
     return " ".join(words)
 
 class TweetRequest(BaseModel):
