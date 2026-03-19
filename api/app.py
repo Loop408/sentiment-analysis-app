@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, make_response
+﻿from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import pickle
 import re
@@ -6,34 +6,13 @@ import os
 
 app = Flask(__name__)
 
-# Configure CORS for GitHub Pages frontend
-CORS(app, resources={
-    r"/*": {
-        "origins": ["https://loop408.github.io", "https://loop408.github.io/sentiment-analysis-app"],
-        "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization", "Accept"],
-        "supports_credentials": True
-    }
-})
+# Enable CORS for all origins
+CORS(app, resources={r"/*": {"origins": "*"}})
 
-# STATIC STOPWORDS - No NLTK needed
-STOP_WORDS = {
-    'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 
-    'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 
-    'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 
-    'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 
-    'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 
-    'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 
-    'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 
-    'at', 'by', 'for', 'with', 'through', 'during', 'before', 'after', 'above', 
-    'below', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 
-    'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 
-    'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 
-    'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 
-    'can', 'will', 'just', 'should', 'now'
-}
+# STATIC STOPWORDS
+STOP_WORDS = {'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'through', 'during', 'before', 'after', 'above', 'below', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 'can', 'will', 'just', 'should', 'now'}
 
-# Lazy load models
+# Load models
 current_dir = os.path.dirname(os.path.abspath(__file__))
 model = pickle.load(open(os.path.join(current_dir, "sentiment_model.pkl"), "rb"))
 vectorizer = pickle.load(open(os.path.join(current_dir, "vectorizer.pkl"), "rb"))
@@ -48,16 +27,20 @@ def clean_text(text):
     words = [w for w in words if w not in STOP_WORDS and len(w) > 2]
     return " ".join(words)
 
-@app.route("/")
-def root():
-    return jsonify({"message": "Twitter Sentiment Analysis API", "status": "running"})
+# Add CORS headers to all responses
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
 
-@app.route("/health")
-def health_check():
-    return jsonify({"status": "healthy", "mode": "flask"})
-
-@app.route("/predict", methods=["POST"])
+# Handle OPTIONS preflight
+@app.route('/predict', methods=['OPTIONS', 'POST'])
 def predict_sentiment():
+    if request.method == 'OPTIONS':
+        return make_response('', 204)
+    
     try:
         data = request.get_json()
         tweet = data.get("tweet", "")
@@ -81,8 +64,12 @@ def predict_sentiment():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/analyze-hashtag", methods=["POST"])
+# Handle OPTIONS preflight
+@app.route('/analyze-hashtag', methods=['OPTIONS', 'POST'])
 def analyze_hashtag():
+    if request.method == 'OPTIONS':
+        return make_response('', 204)
+    
     try:
         data = request.get_json()
         hashtag = data.get("hashtag", "")
@@ -128,5 +115,18 @@ def analyze_hashtag():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/health', methods=['GET', 'OPTIONS'])
+def health_check():
+    if request.method == 'OPTIONS':
+        return make_response('', 204)
+    return jsonify({"status": "healthy", "mode": "flask"})
+
+@app.route('/', methods=['GET', 'OPTIONS'])
+def root():
+    if request.method == 'OPTIONS':
+        return make_response('', 204)
+    return jsonify({"message": "Twitter Sentiment Analysis API", "status": "running"})
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
+
