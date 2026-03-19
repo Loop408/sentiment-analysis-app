@@ -1,11 +1,20 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import pickle
 import re
 import os
 
 app = Flask(__name__)
-CORS(app)
+
+# Configure CORS for GitHub Pages frontend
+CORS(app, resources={
+    r"/*": {
+        "origins": ["https://loop408.github.io", "https://loop408.github.io/sentiment-analysis-app"],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization", "Accept"],
+        "supports_credentials": True
+    }
+})
 
 # STATIC STOPWORDS - No NLTK needed
 STOP_WORDS = {
