@@ -9,6 +9,7 @@ import os
 # Simple stopwords
 STOP_WORDS = {'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'through', 'during', 'before', 'after', 'above', 'below', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 'can', 'will', 'just', 'should', 'now'}
 
+# Create FastAPI app - THIS MUST BE NAMED 'app' FOR VERCEL
 app = FastAPI(title="Twitter Sentiment Analysis API", version="1.0.0")
 
 app.add_middleware(
@@ -19,10 +20,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load model files
-current_dir = os.path.dirname(os.path.abspath(__file__))
-model = pickle.load(open(os.path.join(current_dir, "sentiment_model.pkl"), "rb"))
-vectorizer = pickle.load(open(os.path.join(current_dir, "vectorizer.pkl"), "rb"))
+# LAZY LOADING - Don't load models at import time
+_model = None
+_vectorizer = None
+
+def get_model():
+    global _model
+    if _model is None:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        _model = pickle.load(open(os.path.join(current_dir, "sentiment_model.pkl"), "rb"))
+    return _model
+
+def get_vectorizer():
+    global _vectorizer
+    if _vectorizer is None:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        _vectorizer = pickle.load(open(os.path.join(current_dir, "vectorizer.pkl"), "rb"))
+    return _vectorizer
 
 def clean_text(text):
     text = str(text).lower()
@@ -51,6 +65,8 @@ def health_check():
 @app.post("/predict")
 def predict_sentiment(request: TweetRequest):
     try:
+        model = get_model()
+        vectorizer = get_vectorizer()
         cleaned = clean_text(request.tweet)
         vector = vectorizer.transform([cleaned])
         prediction = model.predict(vector)[0]
@@ -73,6 +89,8 @@ def predict_sentiment(request: TweetRequest):
 @app.post("/analyze-hashtag")
 def analyze_hashtag(request: HashtagRequest):
     try:
+        model = get_model()
+        vectorizer = get_vectorizer()
         sample_tweets = [
             f"I love {request.hashtag}! This is amazing!",
             f"{request.hashtag} is the best thing ever",
