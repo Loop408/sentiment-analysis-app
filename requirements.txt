@@ -1,6 +1,4 @@
-fastapi==0.135.1
-uvicorn==0.41.0
-pandas==3.0.1
-numpy==2.4.3
+flask==3.0.0
+flask-cors==4.0.0
 scikit-learn==1.8.0
-python-multipart==0.0.22
+numpy==2.4.3
