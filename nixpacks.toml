@@ -4,7 +4,7 @@ nixPkgs = ["nodejs", "python3", "python3Packages.pip"]
 [phases.build]
 cmds = [
   "cd frontend && npm install && CI=false npm run build",
-  "cd backend && pip3 install -r requirements.txt"
+  "cd backend && pip3 install --break-system-packages -r requirements.txt"
 ]
 
 [start]
