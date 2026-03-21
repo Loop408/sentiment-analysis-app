@@ -1,14 +1,10 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask import Flask, request, jsonify, send_from_directory
 import pickle
 import re
 import os
 import json
 
-app = Flask(__name__)
-
-# Enable CORS for all origins
-CORS(app)
+app = Flask(__name__, static_folder="../frontend/build", static_url_path="/")
 
 # Static stopwords
 STOP_WORDS = {'i','me','my','myself','we','our','ours','ourselves','you','your','yours','yourself','yourselves','he','him','his','himself','she','her','hers','herself','it','its','itself','they','them','their','theirs','themselves','what','which','who','whom','this','that','these','those','am','is','are','was','were','be','been','being','have','has','had','having','do','does','did','doing','a','an','the','and','but','if','or','because','as','until','while','of','at','by','for','with','through','during','before','after','above','below','up','down','in','out','on','off','over','under','again','further','then','once','here','there','when','where','why','how','all','any','both','each','few','more','most','other','some','such','no','nor','not','only','own','same','so','than','too','very','can','will','just','should','now'}
@@ -28,9 +24,13 @@ def clean_text(text):
     words = [w for w in words if w not in STOP_WORDS and len(w) > 2]
     return " ".join(words)
 
-@app.route('/')
-def root():
-    return jsonify({"message": "Twitter Sentiment Analysis API", "status": "running"})
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve(path):
+    import os
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    return send_from_directory(app.static_folder, "index.html")
 
 @app.route('/health')
 def health():
@@ -104,4 +104,4 @@ def analyze_hashtag():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
