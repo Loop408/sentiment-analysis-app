@@ -5,11 +5,11 @@ cd frontend
 npm install
 
 echo "Building frontend..."
-npm run build
+CI=false npm run build
 
 echo "Installing backend dependencies..."
 cd ../backend
-pip install -r requirements.txt   # ✅ this now works because we are inside backend
+pip3 install -r requirements.txt
 
 echo "Starting Flask server..."
-python app.py
+python3 app.py

@@ -5,7 +5,7 @@ import './WordCloud.css';
 function WordCloud({ words, title = "Key Terms" }) {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
-  const [rendered, setRendered] = useState(false);
+  const [, setRendered] = useState(false);
 
   useEffect(() => {
     if (!words || words.length === 0) {
