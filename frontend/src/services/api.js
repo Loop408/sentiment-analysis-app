@@ -1,10 +1,10 @@
-const API_BASE_URL = 'https://tta-le1jso85u-poornas-projects-4b0c0949.vercel.app';
+const API_BASE_URL = 'https://tta-ajp645124-poornas-projects-4b0c0949.vercel.app';
 
 export const predictSentiment = async (tweet) => {
   const response = await fetch(`${API_BASE_URL}/predict`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'text/plain',
     },
     body: JSON.stringify({ tweet }),
   });
@@ -21,7 +21,7 @@ export const analyzeHashtag = async (hashtag) => {
   const response = await fetch(`${API_BASE_URL}/analyze-hashtag`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'text/plain',
     },
     body: JSON.stringify({ hashtag }),
   });

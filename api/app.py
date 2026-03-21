@@ -3,11 +3,12 @@ from flask_cors import CORS
 import pickle
 import re
 import os
+import json
 
 app = Flask(__name__)
 
-# Simple CORS - allow all origins
-CORS(app, origins="*")
+# Enable CORS for all origins
+CORS(app)
 
 # Static stopwords
 STOP_WORDS = {'i','me','my','myself','we','our','ours','ourselves','you','your','yours','yourself','yourselves','he','him','his','himself','she','her','hers','herself','it','its','itself','they','them','their','theirs','themselves','what','which','who','whom','this','that','these','those','am','is','are','was','were','be','been','being','have','has','had','having','do','does','did','doing','a','an','the','and','but','if','or','because','as','until','while','of','at','by','for','with','through','during','before','after','above','below','up','down','in','out','on','off','over','under','again','further','then','once','here','there','when','where','why','how','all','any','both','each','few','more','most','other','some','such','no','nor','not','only','own','same','so','than','too','very','can','will','just','should','now'}
@@ -38,7 +39,7 @@ def health():
 @app.route('/predict', methods=['POST'])
 def predict_sentiment():
     try:
-        data = request.get_json()
+        data = json.loads(request.data)
         tweet = data.get("tweet", "")
         
         cleaned = clean_text(tweet)
@@ -60,7 +61,7 @@ def predict_sentiment():
 @app.route('/analyze-hashtag', methods=['POST'])
 def analyze_hashtag():
     try:
-        data = request.get_json()
+        data = json.loads(request.data)
         hashtag = data.get("hashtag", "")
         
         sample_tweets = [
