@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_BASE_URL = 'https://tta-1s7pstnev-poornas-projects-4b0c0949.vercel.app';
 
 export const predictSentiment = async (tweet) => {
   const response = await fetch(`${API_BASE_URL}/predict`, {
