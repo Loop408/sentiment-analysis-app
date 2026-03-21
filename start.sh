@@ -9,7 +9,7 @@ npm run build
 
 echo "Installing backend dependencies..."
 cd ../backend
-pip install -r requirements.txt
+pip install -r requirements.txt   # ✅ this now works because we are inside backend
 
 echo "Starting Flask server..."
 python app.py
