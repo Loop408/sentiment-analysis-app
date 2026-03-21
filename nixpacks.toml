@@ -2,10 +2,10 @@
 nixPkgs = [
   "nodejs",
   "python3",
+  "python3Packages.pip",
   "python3Packages.numpy",
   "python3Packages.scikit-learn",
-  "python3Packages.flask",
-  "python3Packages.pip"
+  "python3Packages.flask"
 ]
 
 [phases.build]
