@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://tta-d1i8twrhc-poornas-projects-4b0c0949.vercel.app';
+const API_BASE_URL = 'https://tta-le1jso85u-poornas-projects-4b0c0949.vercel.app';
 
 export const predictSentiment = async (tweet) => {
   const response = await fetch(`${API_BASE_URL}/predict`, {
