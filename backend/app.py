@@ -3,6 +3,7 @@ import pickle
 import re
 import os
 import json
+import csv
 
 app = Flask(__name__, static_folder="../frontend/build", static_url_path="/")
 
@@ -13,6 +14,31 @@ STOP_WORDS = {'i','me','my','myself','we','our','ours','ourselves','you','your',
 current_dir = os.path.dirname(os.path.abspath(__file__))
 model = pickle.load(open(os.path.join(current_dir, "sentiment_model.pkl"), "rb"))
 vectorizer = pickle.load(open(os.path.join(current_dir, "vectorizer.pkl"), "rb"))
+
+# Load datasets into memory
+all_tweets = []
+try:
+    with open(os.path.join(current_dir, "train_data.csv"), "r", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        next(reader) # skip header
+        for row in reader:
+            if row: all_tweets.append(row[0])
+    print(f"Loaded train_data.csv")
+except Exception as e:
+    print(f"Warning: Could not load train_data.csv: {e}")
+
+try:
+    with open(os.path.join(current_dir, "test_data.csv"), "r", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        next(reader) # skip header
+        for row in reader:
+            if row: all_tweets.append(row[0])
+    print(f"Loaded test_data.csv")
+except Exception as e:
+    print(f"Warning: Could not load test_data.csv: {e}")
+    
+print(f"Successfully loaded a total of {len(all_tweets)} tweets from CSV datasets.")
+
 
 def clean_text(text):
     text = str(text).lower()
@@ -64,13 +90,22 @@ def analyze_hashtag():
         data = json.loads(request.data)
         hashtag = data.get("hashtag", "")
         
-        sample_tweets = [
-            f"I love {hashtag}! This is amazing!",
-            f"{hashtag} is the best thing ever",
-            f"Not happy with {hashtag} today",
-            f"{hashtag} is terrible and disappointing",
-            f"Great experience with {hashtag}!"
-        ]
+        sample_tweets = []
+        if hashtag:
+            lower_hashtag = hashtag.lower().strip()
+            # If they entered a hash symbol, skip it for the word search
+            if lower_hashtag.startswith('#'):
+                lower_hashtag = lower_hashtag[1:]
+                
+            search_str = f" {lower_hashtag} "
+            for t in all_tweets:
+                # Pad the tweet with spaces to ensure whole-word matching
+                padded_t = f" {t.lower()} "
+                if search_str in padded_t:
+                    sample_tweets.append(t)
+                        
+        if not sample_tweets:
+            sample_tweets = [f"No real tweets found containing {hashtag}."]
         
         cleaned = [clean_text(t) for t in sample_tweets]
         vectors = vectorizer.transform(cleaned)

@@ -11,26 +11,6 @@ function HashtagAnalyzer() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [recentSearches, setRecentSearches] = useState([]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('recentHashtagSearches');
-    if (saved) {
-      setRecentSearches(JSON.parse(saved));
-    }
-  }, []);
-
-  const saveRecentSearch = (term) => {
-    if (!term.trim()) return;
-    const newSearches = [term, ...recentSearches.filter(s => s !== term)].slice(0, 8);
-    setRecentSearches(newSearches);
-    localStorage.setItem('recentHashtagSearches', JSON.stringify(newSearches));
-  };
-
-  const clearRecentSearches = () => {
-    setRecentSearches([]);
-    localStorage.removeItem('recentHashtagSearches');
-  };
 
   const handleAnalyze = async () => {
     if (!hashtag.trim()) return;
@@ -42,17 +22,11 @@ function HashtagAnalyzer() {
     try {
       const data = await analyzeHashtag(hashtag);
       setResult(data);
-      saveRecentSearch(hashtag);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleRecentClick = (term) => {
-    setHashtag(term);
-    setTimeout(() => handleAnalyze(), 100);
   };
 
   const exportResults = (format) => {
@@ -130,36 +104,6 @@ function HashtagAnalyzer() {
         </motion.button>
       </div>
 
-      {recentSearches.length > 0 && (
-        <motion.div 
-          className="recent-searches"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div className="recent-header">
-            <div className="recent-title">
-              <Clock size={12} />
-              Recent
-            </div>
-            <button className="clear-btn" onClick={clearRecentSearches}>
-              <X size={12} />
-            </button>
-          </div>
-          <div className="recent-tags">
-            {recentSearches.map((term, idx) => (
-              <motion.button
-                key={idx}
-                className="recent-tag"
-                onClick={() => handleRecentClick(term)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                #{term}
-              </motion.button>
-            ))}
-          </div>
-        </motion.div>
-      )}
 
       <AnimatePresence>
         {error && (

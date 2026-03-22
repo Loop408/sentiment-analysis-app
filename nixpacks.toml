@@ -5,13 +5,20 @@ nixPkgs = [
   "python3Packages.pip",
   "python3Packages.numpy",
   "python3Packages.scikit-learn",
-  "python3Packages.flask"
+  "python3Packages.flask",
+  "python3Packages.joblib",
+  "python3Packages.gunicorn"
+]
+
+[phases.install]
+cmds = [
+  "cd frontend && npm install"
 ]
 
 [phases.build]
 cmds = [
-  "cd frontend && npm install && CI=false npm run build"
+  "cd frontend && CI=false npm run build"
 ]
 
 [start]
-cmd = "cd backend && python3 app.py"
+cmd = "cd backend && gunicorn app:app -b 0.0.0.0:${PORT:-5000}"
