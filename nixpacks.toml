@@ -3,9 +3,9 @@ nixPkgs = ["nodejs", "python311", "gcc"]
 
 [phases.install]
 cmds = [
-  "python -m venv /opt/venv",
+  "python3 -m venv /opt/venv",
   "/opt/venv/bin/pip install -U pip",
-  "/opt/venv/bin/pip install -r backend/requirements.txt",
+  "/opt/venv/bin/pip install -r requirements.txt || /opt/venv/bin/pip install -r backend/requirements.txt",
   "cd frontend && npm install"
 ]
 
@@ -15,4 +15,4 @@ cmds = [
 ]
 
 [start]
-cmd = "cd backend && /opt/venv/bin/gunicorn app:app -b 0.0.0.0:${PORT:-5000}"
+cmd = "cd backend && /opt/venv/bin/python -m gunicorn app:app -b 0.0.0.0:${PORT:-5000}"
